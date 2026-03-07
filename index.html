@@ -78,19 +78,33 @@
                 <!-- 帆布袋渲染容器 -->
                 <div id="mockup-container" class="relative w-[400px] max-w-full aspect-[4/5] flex justify-center items-center">
                     
-                    <!-- 修复2：给 SVG 增加 overflow-visible，防止阴影在边界被生硬裁切 -->
-                    <svg viewBox="0 0 400 500" class="absolute inset-0 w-full h-full drop-shadow-2xl overflow-visible" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 修复3：移除导致 Safari 渲染成方形灰块的 CSS `drop-shadow-2xl`，保留 `overflow-visible` -->
+                    <svg viewBox="0 0 400 500" class="absolute inset-0 w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <clipPath id="bag-body-clip">
                                 <path d="M 60 150 Q 55 310 60 470 Q 200 480 340 470 Q 345 310 340 150 Z" />
                             </clipPath>
                             
+                            <!-- 袋身帆布纹理滤镜 -->
                             <filter id="canvas-texture" x="0" y="0" width="100%" height="100%">
                                 <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" result="noise" />
                                 <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.05 0" in="noise" result="coloredNoise" />
                                 <feBlend in="SourceGraphic" in2="coloredNoise" mode="multiply" />
                             </filter>
+
+                            <!-- Safari 完美兼容的高斯模糊投影滤镜 -->
+                            <filter id="native-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="15" />
+                            </filter>
                         </defs>
+
+                        <!-- 纯矢量底层投影层 (不受 Safari WebKit Bug 影响) -->
+                        <g opacity="0.15" filter="url(#native-shadow)" transform="translate(0, 15)">
+                            <!-- 提手投影 -->
+                            <path d="M 155 150 C 155 40 245 40 245 150" fill="none" stroke="#000000" stroke-width="16" />
+                            <!-- 袋身投影 -->
+                            <path d="M 60 150 Q 55 310 60 470 Q 200 480 340 470 Q 345 310 340 150 Z" fill="#000000" />
+                        </g>
 
                         <!-- 后置提手 -->
                         <path d="M 155 150 C 155 40 245 40 245 150" fill="none" stroke="#F7F6F2" stroke-width="16" id="back-handle" />
@@ -116,8 +130,10 @@
                     <svg viewBox="0 0 400 500" class="absolute inset-0 w-full h-full pointer-events-none z-20 overflow-visible" xmlns="http://www.w3.org/2000/svg" style="mix-blend-mode: multiply; opacity: 0.4;">
                         <path d="M 60 150 Q 55 310 60 470 Q 100 475 110 310 Q 115 150 60 150 Z" fill="url(#left-shadow)" />
                         <path d="M 340 150 Q 345 310 340 470 Q 300 475 290 310 Q 285 150 340 150 Z" fill="url(#right-shadow)" />
-                        <path d="M 120 150 Q 150 310 140 470" stroke="#000000" stroke-width="6" fill="none" opacity="0.1" filter="blur(3px)" />
-                        <path d="M 280 150 Q 250 310 260 470" stroke="#000000" stroke-width="8" fill="none" opacity="0.1" filter="blur(4px)" />
+                        
+                        <!-- 修复：将 CSS 简写 filter="blur(3px)" 改为调用 SVG 原生的高斯模糊滤镜 url(#fold-blur-3) -->
+                        <path d="M 120 150 Q 150 310 140 470" stroke="#000000" stroke-width="6" fill="none" opacity="0.1" filter="url(#fold-blur-3)" />
+                        <path d="M 280 150 Q 250 310 260 470" stroke="#000000" stroke-width="8" fill="none" opacity="0.1" filter="url(#fold-blur-4)" />
                         
                         <defs>
                             <linearGradient id="left-shadow" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -128,6 +144,14 @@
                                 <stop offset="0%" stop-color="#000000" stop-opacity="0.3" />
                                 <stop offset="100%" stop-color="#000000" stop-opacity="0" />
                             </linearGradient>
+                            
+                            <!-- 新增：为 Safari 提供完美兼容的原生褶皱模糊滤镜 -->
+                            <filter id="fold-blur-3" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="3" />
+                            </filter>
+                            <filter id="fold-blur-4" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="4" />
+                            </filter>
                         </defs>
                     </svg>
 
@@ -318,3 +342,4 @@
     </script>
 </body>
 </html>
+
