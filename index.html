@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,51 +11,32 @@
     <style>
         .color-swatch {
             transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
-        .color-swatch:hover,
-        .color-swatch.active {
+        .color-swatch:hover, .color-swatch.active {
             transform: scale(1.15);
             border: 2px solid #3b82f6;
         }
-
-        .pattern-btn {
-            transition: all 0.2s ease;
-        }
-
+        .pattern-btn { transition: all 0.2s ease; }
         .pattern-btn.active {
             border-color: #3b82f6;
             background-color: #eff6ff;
         }
-
         /* 美化滑块 */
         input[type=range] {
             accent-color: #3b82f6;
         }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-
-<body class="bg-gray-100 text-gray-800 antialiased h-screen overflow-hidden flex flex-col">
+<!-- 修复1：将 h-screen 替换为 h-[100dvh] 以完美适配 iOS/iPadOS 浏览器的动态工具栏 -->
+<body class="bg-gray-100 text-gray-800 antialiased h-[100dvh] overflow-hidden flex flex-col">
 
     <!-- 顶部导航栏 -->
     <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center z-10 shrink-0">
         <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-            </svg>
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
             帆布袋设计预览台
         </h1>
         <span class="text-sm text-gray-500">Moge Tee Project</span>
@@ -64,111 +44,81 @@
 
     <!-- 主体内容区 -->
     <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
-
+        
         <!-- 左侧/上方：效果图展示区 -->
-        <section id="canvas-area"
-            class="w-full h-[50vh] md:h-auto md:flex-1 bg-gray-50 relative overflow-hidden shrink-0">
-
-            <!-- 悬浮的画布缩放控制器 (仅电脑端显示：hidden md:flex) -->
-            <div
-                class="hidden md:flex absolute bottom-6 right-6 bg-white/90 backdrop-blur rounded-full shadow-lg border border-gray-200 px-3 py-1.5 items-center gap-2 z-30">
+        <!-- 同步使用 dvh 确保手机端一半高度的精确计算 -->
+        <section id="canvas-area" class="w-full h-[50dvh] md:h-auto md:flex-1 bg-gray-50 relative overflow-hidden shrink-0">
+            
+            <!-- 悬浮的画布缩放控制器 (仅电脑/平板端显示) -->
+            <div class="hidden md:flex absolute bottom-6 right-6 bg-white/90 backdrop-blur rounded-full shadow-lg border border-gray-200 px-3 py-1.5 items-center gap-2 z-30">
                 <!-- 复位按钮 -->
-                <button onclick="resetCanvas()"
-                    class="w-8 h-8 flex justify-center items-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition"
-                    title="复位画布">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                        </path>
-                    </svg>
+                <button onclick="resetCanvas()" class="w-8 h-8 flex justify-center items-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition" title="复位画布">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </button>
                 <div class="w-px h-4 bg-gray-300"></div>
-
-                <button onclick="zoomCanvas('out')"
-                    class="w-8 h-8 flex justify-center items-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full font-bold text-xl transition">−</button>
+                
+                <button onclick="zoomCanvas('out')" class="w-8 h-8 flex justify-center items-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full font-bold text-xl transition">−</button>
                 <span id="zoom-level" class="text-xs font-mono font-semibold text-gray-600 w-12 text-center">100%</span>
-                <button onclick="zoomCanvas('in')"
-                    class="w-8 h-8 flex justify-center items-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full font-bold text-xl transition">+</button>
+                <button onclick="zoomCanvas('in')" class="w-8 h-8 flex justify-center items-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full font-bold text-xl transition">+</button>
             </div>
 
             <!-- 手机端专属的复位悬浮按钮 (仅手机端显示，位于预览区域右下角) -->
-            <button onclick="resetCanvas()"
-                class="md:hidden absolute bottom-4 right-4 bg-white/90 backdrop-blur rounded-full shadow-lg border border-gray-200 p-3 flex justify-center items-center text-gray-600 active:bg-blue-100 transition z-40"
-                title="复位画布">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                    </path>
-                </svg>
+            <button onclick="resetCanvas()" class="md:hidden absolute bottom-4 right-4 bg-white/90 backdrop-blur rounded-full shadow-lg border border-gray-200 p-3 flex justify-center items-center text-gray-600 active:bg-blue-100 transition z-40" title="复位画布">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             </button>
 
             <!-- 操作提示 (默认隐藏，触摸/点击时显示) -->
-            <div id="interaction-hint"
-                class="absolute top-6 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-4 py-2 rounded-full pointer-events-none backdrop-blur z-30 transition-opacity duration-300 opacity-0">
-                <!-- 电脑端文本 -->
-                <span class="hidden md:inline">支持鼠标滚轮缩放、拖拽平移</span>
-                <!-- 手机端文本 -->
-                <span class="inline md:hidden">手机单指平移、双指缩放</span>
+            <!-- 统一了文案，加入了 whitespace-nowrap 避免换行 -->
+            <div id="interaction-hint" class="absolute top-6 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-4 py-2 rounded-full pointer-events-none backdrop-blur z-30 transition-opacity duration-300 opacity-0 whitespace-nowrap">
+                <span id="hint-text">拖拽平移、双指/滚轮缩放</span>
             </div>
 
             <!-- 用一个满屏容器包裹，作为平移缩放的目标区域 -->
             <div id="panzoom-wrapper" class="w-full h-full flex justify-center items-center">
                 <!-- 帆布袋渲染容器 -->
-                <div id="mockup-container"
-                    class="relative w-[400px] max-w-full aspect-[4/5] flex justify-center items-center">
-
-                    <!-- SVG 帆布袋底图与形状定义 -->
-                    <svg viewBox="0 0 400 500" class="absolute inset-0 w-full h-full drop-shadow-2xl"
-                        xmlns="http://www.w3.org/2000/svg">
+                <div id="mockup-container" class="relative w-[400px] max-w-full aspect-[4/5] flex justify-center items-center">
+                    
+                    <!-- 修复2：给 SVG 增加 overflow-visible，防止阴影在边界被生硬裁切 -->
+                    <svg viewBox="0 0 400 500" class="absolute inset-0 w-full h-full drop-shadow-2xl overflow-visible" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <clipPath id="bag-body-clip">
                                 <path d="M 60 150 Q 55 310 60 470 Q 200 480 340 470 Q 345 310 340 150 Z" />
                             </clipPath>
-
+                            
                             <filter id="canvas-texture" x="0" y="0" width="100%" height="100%">
                                 <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" result="noise" />
-                                <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.05 0"
-                                    in="noise" result="coloredNoise" />
+                                <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.05 0" in="noise" result="coloredNoise" />
                                 <feBlend in="SourceGraphic" in2="coloredNoise" mode="multiply" />
                             </filter>
                         </defs>
 
                         <!-- 后置提手 -->
-                        <path d="M 155 150 C 155 40 245 40 245 150" fill="none" stroke="#F7F6F2" stroke-width="16"
-                            id="back-handle" />
-                        <path d="M 155 150 C 155 40 245 40 245 150" fill="none" stroke="#000000" stroke-opacity="0.12"
-                            stroke-width="16" pointer-events="none" />
-
+                        <path d="M 155 150 C 155 40 245 40 245 150" fill="none" stroke="#F7F6F2" stroke-width="16" id="back-handle" />
+                        <path d="M 155 150 C 155 40 245 40 245 150" fill="none" stroke="#000000" stroke-opacity="0.12" stroke-width="16" pointer-events="none" />
+                        
                         <!-- 袋身 -->
-                        <path id="bag-body" d="M 60 150 Q 55 310 60 470 Q 200 480 340 470 Q 345 310 340 150 Z"
-                            fill="#F7F6F2" filter="url(#canvas-texture)" transition="fill 0.3s" />
-
+                        <path id="bag-body" d="M 60 150 Q 55 310 60 470 Q 200 480 340 470 Q 345 310 340 150 Z" fill="#F7F6F2" filter="url(#canvas-texture)" transition="fill 0.3s" />
+                        
                         <!-- 前置提手 -->
-                        <path d="M 140 150 C 140 10 260 10 260 150" fill="none" stroke="#F7F6F2" stroke-width="16"
-                            id="front-handle" />
-
-                        <!-- 图案层：移除了正片叠底效果，保持白色实色显示 -->
+                        <path d="M 140 150 C 140 10 260 10 260 150" fill="none" stroke="#F7F6F2" stroke-width="16" id="front-handle" />
+                        
+                        <!-- 图案层 -->
                         <g clip-path="url(#bag-body-clip)">
-                            <image id="pattern-image" x="100" y="215" width="200" height="200"
-                                href="./designs/design1.png" preserveAspectRatio="xMidYMid meet"
+                            <image id="pattern-image" 
+                                x="100" y="215" width="200" height="200" 
+                                href="./designs/design1.png" 
+                                preserveAspectRatio="xMidYMid meet" 
                                 style="opacity: 0.95;" />
                         </g>
                     </svg>
 
-                    <!-- 阴影覆盖层 -->
-                    <svg viewBox="0 0 400 500" class="absolute inset-0 w-full h-full pointer-events-none z-20"
-                        xmlns="http://www.w3.org/2000/svg" style="mix-blend-mode: multiply; opacity: 0.4;">
-                        <path d="M 60 150 Q 55 310 60 470 Q 100 475 110 310 Q 115 150 60 150 Z"
-                            fill="url(#left-shadow)" />
-                        <path d="M 340 150 Q 345 310 340 470 Q 300 475 290 310 Q 285 150 340 150 Z"
-                            fill="url(#right-shadow)" />
-                        <path d="M 120 150 Q 150 310 140 470" stroke="#000000" stroke-width="6" fill="none"
-                            opacity="0.1" filter="blur(3px)" />
-                        <path d="M 280 150 Q 250 310 260 470" stroke="#000000" stroke-width="8" fill="none"
-                            opacity="0.1" filter="blur(4px)" />
-
+                    <!-- 阴影覆盖层：同步加上 overflow-visible 保证万无一失 -->
+                    <svg viewBox="0 0 400 500" class="absolute inset-0 w-full h-full pointer-events-none z-20 overflow-visible" xmlns="http://www.w3.org/2000/svg" style="mix-blend-mode: multiply; opacity: 0.4;">
+                        <path d="M 60 150 Q 55 310 60 470 Q 100 475 110 310 Q 115 150 60 150 Z" fill="url(#left-shadow)" />
+                        <path d="M 340 150 Q 345 310 340 470 Q 300 475 290 310 Q 285 150 340 150 Z" fill="url(#right-shadow)" />
+                        <path d="M 120 150 Q 150 310 140 470" stroke="#000000" stroke-width="6" fill="none" opacity="0.1" filter="blur(3px)" />
+                        <path d="M 280 150 Q 250 310 260 470" stroke="#000000" stroke-width="8" fill="none" opacity="0.1" filter="blur(4px)" />
+                        
                         <defs>
                             <linearGradient id="left-shadow" x1="0%" y1="0%" x2="100%" y2="0%">
                                 <stop offset="0%" stop-color="#000000" stop-opacity="0.3" />
@@ -186,32 +136,20 @@
         </section>
 
         <!-- 右侧/下方：控制面板 -->
-        <section id="controls-area"
-            class="w-full flex-1 md:flex-none md:w-96 bg-white border-t md:border-t-0 md:border-l border-gray-200 shadow-lg flex flex-col overflow-y-auto">
-            <div class="p-6 space-y-8">
-
+        <section id="controls-area" class="w-full flex-1 md:flex-none md:w-96 bg-white border-t md:border-t-0 md:border-l border-gray-200 shadow-lg flex flex-col overflow-y-auto">
+            <!-- 给底部加了 pb-12，防止上传区被系统底部的安全区域遮挡 -->
+            <div class="p-6 space-y-8 pb-12">
+                
                 <!-- 模块 1：选择颜色 -->
                 <div>
                     <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">1. 选择布料颜色</h2>
                     <div class="flex flex-wrap gap-4">
-                        <button onclick="setBagColor('#F7F6F2', this)"
-                            class="color-swatch active w-10 h-10 rounded-full border border-gray-300"
-                            style="background-color: #F7F6F2;" title="原色米白"></button>
-                        <button onclick="setBagColor('#ffffff', this)"
-                            class="color-swatch w-10 h-10 rounded-full border border-gray-300"
-                            style="background-color: #ffffff;" title="纯白"></button>
-                        <button onclick="setBagColor('#1f2937', this)"
-                            class="color-swatch w-10 h-10 rounded-full border border-gray-300"
-                            style="background-color: #1f2937;" title="暗夜黑"></button>
-                        <button onclick="setBagColor('#4b5563', this)"
-                            class="color-swatch w-10 h-10 rounded-full border border-gray-300"
-                            style="background-color: #4b5563;" title="深灰"></button>
-                        <button onclick="setBagColor('#657662', this)"
-                            class="color-swatch w-10 h-10 rounded-full border border-gray-300"
-                            style="background-color: #657662;" title="橄榄绿"></button>
-                        <button onclick="setBagColor('#BA8E62', this)"
-                            class="color-swatch w-10 h-10 rounded-full border border-gray-300"
-                            style="background-color: #BA8E62;" title="卡其色"></button>
+                        <button onclick="setBagColor('#F7F6F2', this)" class="color-swatch active w-10 h-10 rounded-full border border-gray-300" style="background-color: #F7F6F2;" title="原色米白"></button>
+                        <button onclick="setBagColor('#ffffff', this)" class="color-swatch w-10 h-10 rounded-full border border-gray-300" style="background-color: #ffffff;" title="纯白"></button>
+                        <button onclick="setBagColor('#1f2937', this)" class="color-swatch w-10 h-10 rounded-full border border-gray-300" style="background-color: #1f2937;" title="暗夜黑"></button>
+                        <button onclick="setBagColor('#4b5563', this)" class="color-swatch w-10 h-10 rounded-full border border-gray-300" style="background-color: #4b5563;" title="深灰"></button>
+                        <button onclick="setBagColor('#657662', this)" class="color-swatch w-10 h-10 rounded-full border border-gray-300" style="background-color: #657662;" title="橄榄绿"></button>
+                        <button onclick="setBagColor('#BA8E62', this)" class="color-swatch w-10 h-10 rounded-full border border-gray-300" style="background-color: #BA8E62;" title="卡其色"></button>
                     </div>
                 </div>
 
@@ -219,11 +157,9 @@
                 <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
                     <h2 class="text-sm font-bold text-gray-700 mb-3 flex items-center justify-between">
                         印花缩放调整
-                        <span id="pattern-size-label"
-                            class="text-xs text-blue-600 font-mono bg-white border border-blue-200 px-2 py-1 rounded">100%</span>
+                        <span id="pattern-size-label" class="text-xs text-blue-600 font-mono bg-white border border-blue-200 px-2 py-1 rounded">100%</span>
                     </h2>
-                    <input type="range" id="pattern-scale" min="80" max="320" step="5" value="200"
-                        class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer">
+                    <input type="range" id="pattern-scale" min="80" max="320" step="5" value="200" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer">
                     <div class="flex justify-between text-xs text-gray-500 mt-2">
                         <span>小印花</span>
                         <span>居中</span>
@@ -231,24 +167,20 @@
                     </div>
                 </div>
 
-                <!-- 模块 3：选择预设图案 (移除了预览图的正片叠底class) -->
+                <!-- 模块 3：选择预设图案 -->
                 <div>
                     <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">2. 选择设计图案</h2>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="setPattern('./designs/design1.png', this)"
-                            class="pattern-btn active border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
+                        <button onclick="setPattern('./designs/design1.png', this)" class="pattern-btn active border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
                             <img src="./designs/design1.png" class="w-full h-full object-contain" alt="图案 1">
                         </button>
-                        <button onclick="setPattern('./designs/design2.PNG', this)"
-                            class="pattern-btn border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
+                        <button onclick="setPattern('./designs/design2.PNG', this)" class="pattern-btn border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
                             <img src="./designs/design2.PNG" class="w-full h-full object-contain" alt="图案 2">
                         </button>
-                        <button onclick="setPattern('./designs/design3.PNG', this)"
-                            class="pattern-btn border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
+                        <button onclick="setPattern('./designs/design3.PNG', this)" class="pattern-btn border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
                             <img src="./designs/design3.PNG" class="w-full h-full object-contain" alt="图案 3">
                         </button>
-                        <button onclick="setPattern('./designs/design4.PNG', this)"
-                            class="pattern-btn border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
+                        <button onclick="setPattern('./designs/design4.PNG', this)" class="pattern-btn border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
                             <img src="./designs/design4.PNG" class="w-full h-full object-contain" alt="图案 4">
                         </button>
                     </div>
@@ -256,26 +188,18 @@
 
                 <!-- 模块 4：上传自己的图案 -->
                 <div>
-                    <h2
-                        class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center justify-between">
                         3. 测试你的设计
                         <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full normal-case">仅本地渲染</span>
                     </h2>
-
-                    <label
-                        class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                    
+                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                            <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                </path>
-                            </svg>
+                            <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                             <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">点击上传图片</span> (PNG 最佳)</p>
                             <p class="text-xs text-gray-400">支持透明背景的 PNG 格式</p>
                         </div>
-                        <input type="file" id="image-upload" accept="image/png, image/jpeg, image/svg+xml"
-                            class="hidden" />
+                        <input type="file" id="image-upload" accept="image/png, image/jpeg, image/svg+xml" class="hidden" />
                     </label>
                 </div>
 
@@ -300,23 +224,23 @@
             frontHandle.setAttribute('stroke', hexColor);
             backHandle.setAttribute('stroke', hexColor);
             document.querySelectorAll('.color-swatch').forEach(btn => btn.classList.remove('active'));
-            if (buttonElement) buttonElement.classList.add('active');
+            if(buttonElement) buttonElement.classList.add('active');
         }
 
         // --- 功能 2：切换预设图案 ---
         function setPattern(imageUrl, buttonElement) {
             patternImg.setAttribute('href', imageUrl);
             document.querySelectorAll('.pattern-btn').forEach(btn => btn.classList.remove('active'));
-            if (buttonElement) buttonElement.classList.add('active');
+            if(buttonElement) buttonElement.classList.add('active');
         }
 
         // --- 功能 3：本地上传图片 ---
-        imageUpload.addEventListener('change', function (e) {
+        imageUpload.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             document.querySelectorAll('.pattern-btn').forEach(btn => btn.classList.remove('active'));
             const reader = new FileReader();
-            reader.onload = function (event) {
+            reader.onload = function(event) {
                 patternImg.setAttribute('href', event.target.result);
             };
             reader.readAsDataURL(file);
@@ -325,7 +249,7 @@
         // --- 功能 4：画布整体缩放与平移 (使用 Panzoom 实现丝滑交互) ---
         const canvasArea = document.getElementById('canvas-area');
         const panzoomWrapper = document.getElementById('panzoom-wrapper');
-
+        
         // 初始化 Panzoom 引擎
         const panzoom = Panzoom(panzoomWrapper, {
             maxScale: 5,      // 最大放大到 500%
@@ -359,17 +283,17 @@
         const patternScaleSlider = document.getElementById('pattern-scale');
         const patternSizeLabel = document.getElementById('pattern-size-label');
 
-        patternScaleSlider.addEventListener('input', function (e) {
+        patternScaleSlider.addEventListener('input', function(e) {
             const size = parseInt(e.target.value);
             // 保持图案在袋身正中心 (X中心=200, Y中心=315)
             const x = 200 - (size / 2);
             const y = 315 - (size / 2);
-
+            
             patternImg.setAttribute('width', size);
             patternImg.setAttribute('height', size);
             patternImg.setAttribute('x', x);
             patternImg.setAttribute('y', y);
-
+            
             // 基于默认尺寸 200 计算百分比
             const percentage = Math.round((size / 200) * 100);
             patternSizeLabel.innerText = percentage + '%';
@@ -377,17 +301,14 @@
 
         // --- 功能 7：动态显示/隐藏操作提示 ---
         const interactionHint = document.getElementById('interaction-hint');
-
-        // 监听全局交互事件（使用 capture 保证第一时间捕获触摸/点击/滚轮行为）
+        
+        // 监听全局交互事件
         ['pointerdown', 'touchstart', 'wheel'].forEach(eventType => {
-            document.addEventListener(eventType, function (e) {
-                // 如果用户在画布区域操作 -> 显示提示
+            document.addEventListener(eventType, function(e) {
                 if (e.target.closest('#canvas-area')) {
                     interactionHint.classList.remove('opacity-0');
                     interactionHint.classList.add('opacity-100');
-                }
-                // 如果用户在下方的控制面板区域或顶部导航操作 -> 隐藏提示
-                else if (e.target.closest('#controls-area') || e.target.closest('header')) {
+                } else if (e.target.closest('#controls-area') || e.target.closest('header')) {
                     interactionHint.classList.remove('opacity-100');
                     interactionHint.classList.add('opacity-0');
                 }
@@ -396,5 +317,4 @@
 
     </script>
 </body>
-
 </html>
