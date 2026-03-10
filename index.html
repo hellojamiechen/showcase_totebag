@@ -30,7 +30,6 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-<!-- 修复1：将 h-screen 替换为 h-[100dvh] 以完美适配 iOS/iPadOS 浏览器的动态工具栏 -->
 <body class="bg-gray-100 text-gray-800 antialiased h-[100dvh] overflow-hidden flex flex-col">
 
     <!-- 顶部导航栏 -->
@@ -46,12 +45,10 @@
     <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
         
         <!-- 左侧/上方：效果图展示区 -->
-        <!-- 同步使用 dvh 确保手机端一半高度的精确计算 -->
         <section id="canvas-area" class="w-full h-[50dvh] md:h-auto md:flex-1 bg-gray-50 relative overflow-hidden shrink-0">
             
             <!-- 悬浮的画布缩放控制器 (仅电脑/平板端显示) -->
             <div class="hidden md:flex absolute bottom-6 right-6 bg-white/90 backdrop-blur rounded-full shadow-lg border border-gray-200 px-3 py-1.5 items-center gap-2 z-30">
-                <!-- 复位按钮 -->
                 <button onclick="resetCanvas()" class="w-8 h-8 flex justify-center items-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition" title="复位画布">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </button>
@@ -62,47 +59,39 @@
                 <button onclick="zoomCanvas('in')" class="w-8 h-8 flex justify-center items-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full font-bold text-xl transition">+</button>
             </div>
 
-            <!-- 手机端专属的复位悬浮按钮 (仅手机端显示，位于预览区域右下角) -->
+            <!-- 手机端专属的复位悬浮按钮 -->
             <button onclick="resetCanvas()" class="md:hidden absolute bottom-4 right-4 bg-white/90 backdrop-blur rounded-full shadow-lg border border-gray-200 p-3 flex justify-center items-center text-gray-600 active:bg-blue-100 transition z-40" title="复位画布">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             </button>
 
-            <!-- 操作提示 (默认隐藏，触摸/点击时显示) -->
-            <!-- 统一了文案，加入了 whitespace-nowrap 避免换行 -->
+            <!-- 操作提示 -->
             <div id="interaction-hint" class="absolute top-6 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-4 py-2 rounded-full pointer-events-none backdrop-blur z-30 transition-opacity duration-300 opacity-0 whitespace-nowrap">
                 <span id="hint-text">拖拽平移、双指/滚轮缩放</span>
             </div>
 
-            <!-- 用一个满屏容器包裹，作为平移缩放的目标区域 -->
+            <!-- 帆布袋渲染容器 -->
             <div id="panzoom-wrapper" class="w-full h-full flex justify-center items-center">
-                <!-- 帆布袋渲染容器 -->
                 <div id="mockup-container" class="relative w-[400px] max-w-full aspect-[4/5] flex justify-center items-center">
                     
-                    <!-- 修复3：移除导致 Safari 渲染成方形灰块的 CSS `drop-shadow-2xl`，保留 `overflow-visible` -->
+                    <!-- SVG 1：帆布袋底图与外阴影 -->
                     <svg viewBox="0 0 400 500" class="absolute inset-0 w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <clipPath id="bag-body-clip">
                                 <path d="M 60 150 Q 55 310 60 470 Q 200 480 340 470 Q 345 310 340 150 Z" />
                             </clipPath>
-                            
-                            <!-- 袋身帆布纹理滤镜 -->
                             <filter id="canvas-texture" x="0" y="0" width="100%" height="100%">
                                 <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" result="noise" />
                                 <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.05 0" in="noise" result="coloredNoise" />
                                 <feBlend in="SourceGraphic" in2="coloredNoise" mode="multiply" />
                             </filter>
-
-                            <!-- Safari 完美兼容的高斯模糊投影滤镜 -->
                             <filter id="native-shadow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feGaussianBlur stdDeviation="15" />
                             </filter>
                         </defs>
 
-                        <!-- 纯矢量底层投影层 (不受 Safari WebKit Bug 影响) -->
+                        <!-- 底层投影 -->
                         <g opacity="0.15" filter="url(#native-shadow)" transform="translate(0, 15)">
-                            <!-- 提手投影 -->
                             <path d="M 155 150 C 155 40 245 40 245 150" fill="none" stroke="#000000" stroke-width="16" />
-                            <!-- 袋身投影 -->
                             <path d="M 60 150 Q 55 310 60 470 Q 200 480 340 470 Q 345 310 340 150 Z" fill="#000000" />
                         </g>
 
@@ -116,22 +105,20 @@
                         <!-- 前置提手 -->
                         <path d="M 140 150 C 140 10 260 10 260 150" fill="none" stroke="#F7F6F2" stroke-width="16" id="front-handle" />
                         
-                        <!-- 图案层 -->
+                        <!-- 图案层 (这里的 href 会被 JS 初始化覆盖) -->
                         <g clip-path="url(#bag-body-clip)">
                             <image id="pattern-image" 
                                 x="100" y="215" width="200" height="200" 
-                                href="./designs/design1.png" 
+                                href="" 
                                 preserveAspectRatio="xMidYMid meet" 
                                 style="opacity: 0.95;" />
                         </g>
                     </svg>
 
-                    <!-- 阴影覆盖层：同步加上 overflow-visible 保证万无一失 -->
+                    <!-- SVG 2：阴影覆盖层与褶皱 -->
                     <svg viewBox="0 0 400 500" class="absolute inset-0 w-full h-full pointer-events-none z-20 overflow-visible" xmlns="http://www.w3.org/2000/svg" style="mix-blend-mode: multiply; opacity: 0.4;">
                         <path d="M 60 150 Q 55 310 60 470 Q 100 475 110 310 Q 115 150 60 150 Z" fill="url(#left-shadow)" />
                         <path d="M 340 150 Q 345 310 340 470 Q 300 475 290 310 Q 285 150 340 150 Z" fill="url(#right-shadow)" />
-                        
-                        <!-- 修复：将 CSS 简写 filter="blur(3px)" 改为调用 SVG 原生的高斯模糊滤镜 url(#fold-blur-3) -->
                         <path d="M 120 150 Q 150 310 140 470" stroke="#000000" stroke-width="6" fill="none" opacity="0.1" filter="url(#fold-blur-3)" />
                         <path d="M 280 150 Q 250 310 260 470" stroke="#000000" stroke-width="8" fill="none" opacity="0.1" filter="url(#fold-blur-4)" />
                         
@@ -144,14 +131,8 @@
                                 <stop offset="0%" stop-color="#000000" stop-opacity="0.3" />
                                 <stop offset="100%" stop-color="#000000" stop-opacity="0" />
                             </linearGradient>
-                            
-                            <!-- 新增：为 Safari 提供完美兼容的原生褶皱模糊滤镜 -->
-                            <filter id="fold-blur-3" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="3" />
-                            </filter>
-                            <filter id="fold-blur-4" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="4" />
-                            </filter>
+                            <filter id="fold-blur-3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" /></filter>
+                            <filter id="fold-blur-4" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" /></filter>
                         </defs>
                     </svg>
 
@@ -161,7 +142,6 @@
 
         <!-- 右侧/下方：控制面板 -->
         <section id="controls-area" class="w-full flex-1 md:flex-none md:w-96 bg-white border-t md:border-t-0 md:border-l border-gray-200 shadow-lg flex flex-col overflow-y-auto">
-            <!-- 给底部加了 pb-12，防止上传区被系统底部的安全区域遮挡 -->
             <div class="p-6 space-y-8 pb-12">
                 
                 <!-- 模块 1：选择颜色 -->
@@ -191,22 +171,12 @@
                     </div>
                 </div>
 
-                <!-- 模块 3：选择预设图案 -->
+                <!-- 模块 3：选择预设图案 (完全由 JS 动态生成，支持自动读取 Github) -->
                 <div>
                     <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">2. 选择设计图案</h2>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="setPattern('./designs/design1.png', this)" class="pattern-btn active border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
-                            <img src="./designs/design1.png" class="w-full h-full object-contain" alt="图案 1">
-                        </button>
-                        <button onclick="setPattern('./designs/design2.PNG', this)" class="pattern-btn border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
-                            <img src="./designs/design2.PNG" class="w-full h-full object-contain" alt="图案 2">
-                        </button>
-                        <button onclick="setPattern('./designs/design3.PNG', this)" class="pattern-btn border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
-                            <img src="./designs/design3.PNG" class="w-full h-full object-contain" alt="图案 3">
-                        </button>
-                        <button onclick="setPattern('./designs/design4.PNG', this)" class="pattern-btn border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white">
-                            <img src="./designs/design4.PNG" class="w-full h-full object-contain" alt="图案 4">
-                        </button>
+                    <div id="pattern-gallery" class="grid grid-cols-2 gap-3">
+                        <!-- 按钮将由配置列表自动生成，初始显示加载中提示 -->
+                        <div class="col-span-2 text-center text-sm text-gray-400 py-4">正在从 Github 读取图库...</div>
                     </div>
                 </div>
 
@@ -233,11 +203,89 @@
 
     <!-- 交互逻辑脚本 -->
     <script>
+        // =========================================================================
+        // 🚀🚀🚀 【黑科技：自动读取 Github 图片】 🚀🚀🚀
+        // =========================================================================
+        
+        // 当 Github API 加载失败时（比如网络问题）使用的后备预设列表
+        const fallbackDesigns = ["design1.png", "design2.png", "design3.png", "design4.png"];
+
+        const patternGallery = document.getElementById('pattern-gallery');
+        const patternImg = document.getElementById('pattern-image');
+
+        // --- 功能：渲染画廊的主函数 ---
+        function renderGallery(designsList) {
+            patternGallery.innerHTML = ''; // 清空加载中提示
+            
+            designsList.forEach((filename, index) => {
+                const imageUrl = `./designs/${filename}`;
+                
+                const btn = document.createElement('button');
+                const activeClass = index === 0 ? 'active' : '';
+                btn.className = `pattern-btn ${activeClass} border border-gray-200 rounded-lg p-2 aspect-square flex justify-center items-center hover:bg-gray-50 bg-white`;
+                
+                btn.onclick = function() {
+                    setPattern(imageUrl, this);
+                };
+
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.className = "w-full h-full object-contain";
+                img.alt = `预设设计 ${index + 1}`;
+
+                btn.appendChild(img);
+                patternGallery.appendChild(btn);
+            });
+
+            // 默认加载列表第一张
+            if (designsList.length > 0) {
+                patternImg.setAttribute('href', `./designs/${designsList[0]}`);
+            }
+        }
+
+        // --- 功能：调用 GitHub 官方 API 自动读取设计的核心逻辑 ---
+        async function loadDesignsFromGithub() {
+            try {
+                // 你的 Github 信息
+                const repoOwner = 'hellojamiechen';
+                const repoName = 'showcase_totebag';
+                const folderPath = 'designs';
+                
+                // Github 读取文件夹内容的 API 接口
+                const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`;
+                
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error('API Rate limit or folder not found');
+                
+                const data = await response.json();
+                
+                // 过滤出所有的图片文件 (png, jpg, jpeg, svg)，并提取文件名
+                const imageFiles = data
+                    .filter(file => file.type === 'file' && file.name.match(/\.(png|jpe?g|svg)$/i))
+                    .map(file => file.name);
+                
+                // 渲染提取到的图片列表
+                if (imageFiles.length > 0) {
+                    renderGallery(imageFiles);
+                } else {
+                    renderGallery(fallbackDesigns);
+                }
+            } catch (error) {
+                console.warn('自动读取失败，降级使用默认列表:', error);
+                renderGallery(fallbackDesigns);
+            }
+        }
+
+        // 启动时自动执行读取
+        loadDesignsFromGithub();
+
+
+        // =========================================================================
         // --- 核心 DOM 元素 ---
+        // =========================================================================
         const bagBody = document.getElementById('bag-body');
         const frontHandle = document.getElementById('front-handle');
         const backHandle = document.getElementById('back-handle');
-        const patternImg = document.getElementById('pattern-image');
         const imageUpload = document.getElementById('image-upload');
         const mockupContainer = document.getElementById('mockup-container');
         const zoomLevelText = document.getElementById('zoom-level');
@@ -276,34 +324,30 @@
         
         // 初始化 Panzoom 引擎
         const panzoom = Panzoom(panzoomWrapper, {
-            maxScale: 5,      // 最大放大到 500%
-            minScale: 0.3,    // 最小缩小到 30%
-            step: 0.1,        // 按钮点击时的缩放步长
-            cursor: 'grab'    // 默认鼠标显示为“抓取”手势
+            maxScale: 5, minScale: 0.3, step: 0.1, cursor: 'grab'
         });
 
-        // 绑定鼠标滚轮事件 (以鼠标当前位置为中心缩放)
+        // 绑定鼠标滚轮事件
         canvasArea.addEventListener('wheel', panzoom.zoomWithWheel);
 
-        // 监听缩放事件，动态更新页面上的百分比数字
+        // 监听缩放事件更新百分比数字
         panzoomWrapper.addEventListener('panzoomzoom', (e) => {
             const scale = Math.round(e.detail.scale * 100);
             zoomLevelText.innerText = scale + '%';
         });
 
-        // 绑定右下角的加减按钮点击事件
         function zoomCanvas(action) {
             if (action === 'in') panzoom.zoomIn();
             if (action === 'out') panzoom.zoomOut();
         }
 
-        // --- 功能 6：复位画布 ---
+        // --- 功能 5：复位画布 ---
         function resetCanvas() {
             panzoom.reset();
             zoomLevelText.innerText = '100%';
         }
 
-        // --- 功能 5：调节印花自身大小 ---
+        // --- 功能 6：调节印花自身大小 ---
         const patternScaleSlider = document.getElementById('pattern-scale');
         const patternSizeLabel = document.getElementById('pattern-size-label');
 
@@ -326,7 +370,7 @@
         // --- 功能 7：动态显示/隐藏操作提示 ---
         const interactionHint = document.getElementById('interaction-hint');
         
-        // 监听全局交互事件
+        // 监听全局交互事件（使用 capture 保证第一时间捕获触摸/点击/滚轮行为）
         ['pointerdown', 'touchstart', 'wheel'].forEach(eventType => {
             document.addEventListener(eventType, function(e) {
                 if (e.target.closest('#canvas-area')) {
@@ -342,4 +386,5 @@
     </script>
 </body>
 </html>
+
 
